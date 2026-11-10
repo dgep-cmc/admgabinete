@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Exoneração — Diego Martins</title>
+<script src="/jspdf.umd.min.js"></script>
+<style>
+:root{--fundo:#F2F3F1;--sup:#fff;--tinta:#182528;--mut:#5A6B6B;--linha:#D9DEDB;--verde:#0E4D36;--verde2:#E6F0EB;--erro:#B42318;--ok:#0E4D36;--fonte:"Helvetica Neue",Helvetica,Roboto,Arial,"Segoe UI",sans-serif}
+*{box-sizing:border-box}
+body{font-family:var(--fonte);margin:0;background:var(--fundo);color:var(--tinta);-webkit-font-smoothing:antialiased}
+.wrap{max-width:640px;margin:0 auto;padding:28px 18px 40px}
+.topo{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-bottom:18px;border-bottom:1px solid var(--linha)}
+.topo small{font-size:12px;letter-spacing:.06em;color:var(--mut)}
+.topo strong{font-family:var(--fonte);font-size:20px;font-weight:700;white-space:nowrap}
+.menu{display:flex;gap:18px;padding:14px 0;border-bottom:1px solid var(--linha);flex-wrap:wrap}
+.menu a{font-size:14px;font-weight:600;color:var(--tinta);text-decoration:none}
+.menu a.ativo{color:var(--verde);border-bottom:2px solid var(--verde);padding-bottom:2px}
+h1{font-family:var(--fonte);font-size:28px;line-height:1.1;margin:20px 0 4px;font-weight:700;letter-spacing:-.02em}
+.titulo-linha{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.btn-enviar{height:44px;padding:0 16px;border-radius:2px;border:1px solid var(--verde);background:#fff;color:var(--verde);font-weight:600;cursor:pointer;font-family:var(--fonte);white-space:nowrap;margin-top:20px;flex-shrink:0}
+.sub{color:var(--mut);font-size:14px;margin:0 0 18px}
+.box{background:var(--sup);border:1px solid var(--linha);padding:16px 14px}
+.campo{margin-bottom:12px}
+.campo label{font-size:13px;font-weight:600;display:block;margin-bottom:6px}
+.campo input,.campo select{width:100%;height:44px;border:1px solid var(--linha);padding:0 10px;font-family:var(--fonte);font-size:14px;border-radius:2px;background:#fff}
+.duas{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.duas{grid-template-columns:1fr}}
+.msg{margin-top:10px;font-size:13px;font-weight:600}
+.msg.ok{color:var(--ok)} .msg.err{color:var(--erro)}
+.acoes{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+.acoes button{height:44px;padding:0 18px;border-radius:2px;border:1px solid var(--verde);background:var(--verde);color:#fff;font-weight:600;cursor:pointer;font-family:var(--fonte)}
+.acoes button:disabled{opacity:.45;cursor:not-allowed;background:#fff;color:var(--verde)}
+.acoes .ghost{background:#fff;color:var(--verde)}
+.titulo-lista{font-size:13px;font-weight:700;margin:18px 0 8px;color:var(--tinta)}
+.lista-salvos{display:flex;flex-direction:column;gap:8px}
+.pedido{border:1px solid var(--linha);background:#fff;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;justify-content:space-between}
+.pedido:hover{border-color:var(--verde)}
+.pedido .info{flex:1;min-width:0}
+.pedido b{font-size:14px;display:block}
+.pedido span{font-size:12px;color:var(--mut)}
+.btn-excluir{height:32px;padding:0 10px;border:1px solid var(--linha);background:#fff;color:var(--erro);font-family:var(--fonte);font-weight:600;font-size:12px;cursor:pointer;flex-shrink:0}
+:focus-visible{outline:2px solid var(--verde);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="topo"><small>Câmara Municipal de Curitiba</small><strong>Diego Martins</strong></div>
+<nav class="menu">
+  <a href="/portal-diego-martins.html">Início</a>
+  <a href="/gabinete-diego-martins.html">Composição do Gabinete</a>
+  <a href="/admissao-diego-martins.html">Admissão</a>
+  <a class="ativo" href="/exoneracao-diego-martins.html">Exoneração</a>
+</nav>
+
+<div class="titulo-linha">
+<div><h1>Exoneração</h1>
+<p class="sub">Indicação para exoneração de cargo em comissão</p></div>
+<button id="enviar" type="button" class="btn-enviar">Enviar requerimento</button>
+</div>
+<div class="box">
+<div class="duas">
+<div class="campo"><label for="nome">Nome</label><input id="nome" autocomplete="off" placeholder="Nome completo"/></div>
+<div class="campo"><label for="matricula">Matrícula</label><input id="matricula" autocomplete="off" placeholder="N.º da matrícula"/></div>
+</div>
+<div class="duas">
+<div class="campo"><label for="cargo">Cargo</label>
+<select id="cargo"><option value="">Selecione</option><option>Chefe de Gabinete Parlamentar</option><option>Assessor de Gabinete Parlamentar</option></select></div>
+<div class="campo"><label for="simbolo">Símbolo</label>
+<select id="simbolo"><option value="">Selecione</option><option>CC1</option><option>CC2</option><option>CC3</option><option>CC4</option><option>CC5</option><option>CC6</option><option>CC7</option><option>CC8</option><option>CC9</option></select></div>
+</div>
+<div class="campo"><label for="lotacao">Lotação</label><input id="lotacao" value="GABINETE DO VEREADOR DIEGO MARTINS"/></div>
+<div class="campo"><label for="data">Exonerar a partir de</label><input id="data" type="date"/></div>
+<div class="msg" id="msg"></div>
+<div class="acoes">
+<button id="salvar">Salvar</button>
+<button id="pdf">Gerar PDF</button>
+<button class="ghost" id="limpar" type="button">Limpar</button>
+</div>
+<div class="titulo-lista">Pedidos salvos</div>
+<div class="lista-salvos" id="listaSalvos"></div>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const CHAVE='exoneracao-diego-martins-lista';
+let atualId=null;
+let memoryStorage = {};
+function lerLista(){try{return JSON.parse(localStorage.getItem(CHAVE)||'[]')}catch(e){return memoryStorage[CHAVE]?JSON.parse(memoryStorage[CHAVE]):[]}}
+function gravarLista(a){try{localStorage.setItem(CHAVE,JSON.stringify(a))}catch(e){memoryStorage[CHAVE]=JSON.stringify(a)}}
+function safeConfirm(msg){try{return confirm(msg)}catch(e){return true}}
+function fmtDataISO(iso){if(!iso)return'';const [a,b,c]=iso.split('-');return `${c}/${b}/${a}`}
+function fmtSalvo(iso){try{const d=new Date(iso);return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}catch(e){return''}}
+const GABINETE='VER. DIEGO MARTINS';
+const TIPO='Exoneração';
+const FORM_URL='https://docs.google.com/forms/d/e/1FAIpQLSd6LMIcKR21tUQ0IYhZKFdIrm6kP8-RW2VKT4CNYVD3n287gg/viewform?usp=dialog';
+$('enviar').onclick=()=>{
+if(!FORM_URL){const m=$('msg');m.textContent='Form ainda não configurado.';m.className='msg err';alert('Form ainda não configurado. Solicite ao Gemini a criação do Forms + Planilha + Drive.');return}
+window.open(FORM_URL,'_blank');
+};
+function atualizarSimbolos(){
+const cargo=$('cargo').value;
+const sel=$('simbolo');const atual=sel.value;
+sel.innerHTML='<option value="">Selecione</option>';
+let opts=[];
+if(cargo==='Chefe de Gabinete Parlamentar')opts=['CC1'];
+else if(cargo==='Assessor de Gabinete Parlamentar')opts=['CC2','CC3','CC4','CC5','CC6','CC7','CC8','CC9'];
+opts.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o)});
+if(opts.includes(atual))sel.value=atual;
+else if(cargo==='Chefe de Gabinete Parlamentar')sel.value='CC1';
+else sel.value='';
+}
+function renderLista(){
+const el=$('listaSalvos');el.innerHTML='';
+const arr=lerLista();
+if(arr.length===0){el.innerHTML='<div class="pedido" style="cursor:default">Nenhum pedido salvo.</div>';return}
+arr.forEach(it=>{
+const d=document.createElement('div');d.className='pedido';
+const info=document.createElement('div');info.className='info';
+info.innerHTML=`<b>${it.nome}</b><span>${it.cargo} · ${it.simbolo} · ${fmtDataISO(it.data)} · salvo em ${fmtSalvo(it.salvoEm)}</span>`;
+const del=document.createElement('button');del.type='button';del.className='btn-excluir';del.textContent='Excluir';
+del.onclick=e=>{
+e.stopPropagation();
+if(!safeConfirm('Tem certeza que deseja excluir?'))return;
+const atual=lerLista().filter(x=>x.id!==it.id);gravarLista(atual);
+if(atualId===it.id){atualId=null;['nome','matricula','cargo','simbolo','data'].forEach(id=>$(id).value='');atualizarSimbolos();$('lotacao').value='GABINETE DO VEREADOR DIEGO MARTINS';render()}
+renderLista();
+};
+d.append(info,del);
+d.onclick=()=>{
+atualId=it.id;
+$('nome').value=it.nome;$('matricula').value=it.matricula;$('cargo').value=it.cargo;atualizarSimbolos();$('simbolo').value=it.simbolo;$('lotacao').value=it.lotacao;$('data').value=it.data;render();
+const m=$('msg');m.textContent='Pedido carregado.';m.className='msg ok';
+};
+el.appendChild(d);
+});
+}
+function valido(){
+const nome=$('nome').value.trim(), mat=$('matricula').value.trim(), cargo=$('cargo').value, sim=$('simbolo').value, lot=$('lotacao').value.trim(), data=$('data').value;
+if(!nome||!mat||!cargo||!sim||!lot||!data)return false;return true;
+}
+function render(){
+const ok=valido();
+const msg=$('msg');
+if(ok){msg.textContent='Dados válidos.';msg.className='msg ok'}
+else{msg.textContent='Preencha nome, matrícula, cargo, símbolo, lotação e data.';msg.className='msg err'}
+$('salvar').disabled=!ok;$('pdf').disabled=!ok;
+}
+function salvarLocal(){
+const dados={nome:$('nome').value.trim(),matricula:$('matricula').value.trim(),cargo:$('cargo').value,simbolo:$('simbolo').value,lotacao:$('lotacao').value.trim(),data:$('data').value,salvoEm:new Date().toISOString()};
+const arr=lerLista();
+if(atualId){const ix=arr.findIndex(x=>x.id===atualId);if(ix>=0){arr[ix]={...arr[ix],...dados}}else{arr.unshift({id:atualId,...dados})}}
+else{atualId='e'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);arr.unshift({id:atualId,...dados})}
+arr.sort((a,b)=>new Date(b.salvoEm)-new Date(a.salvoEm));
+gravarLista(arr);renderLista();
+}
+['nome','matricula','cargo','simbolo','lotacao','data'].forEach(id=>{$(id).addEventListener('input',render);$(id).addEventListener('change',render)});
+$('cargo').addEventListener('change',()=>{atualizarSimbolos();render()});
+$('limpar').onclick=()=>{if(!safeConfirm('Tem certeza que deseja apagar tudo e recomeçar?'))return;['nome','matricula','cargo','simbolo','data'].forEach(id=>$(id).value='');atualizarSimbolos();atualId=null;$('lotacao').value='GABINETE DO VEREADOR DIEGO MARTINS';render()};
+$('salvar').onclick=()=>{if(!safeConfirm('Deseja salvar esta exoneração?'))return;salvarLocal();const m=$('msg');m.textContent='Salva.';m.className='msg ok'};
+(function inicializar(){
+let arr=lerLista();
+if(arr.length===0){try{const antigo=JSON.parse(localStorage.getItem('exoneracao-diego-martins')||'null');if(antigo&&antigo.nome){arr=[{id:'e'+Date.now().toString(36),...antigo}];gravarLista(arr);localStorage.removeItem('exoneracao-diego-martins')}}catch(e){}}
+if(arr.length>0){const s=arr[0];atualId=s.id;$('nome').value=s.nome||'';$('matricula').value=s.matricula||'';$('cargo').value=s.cargo||'';atualizarSimbolos();$('simbolo').value=s.simbolo||'';$('lotacao').value=s.lotacao||'GABINETE DO VEREADOR DIEGO MARTINS';$('data').value=s.data||''}
+atualizarSimbolos();renderLista();render();
+})();
+async function carregarLogo(){try{const r=await fetch('/logo.png');if(!r.ok)return null;const b=await r.blob();return await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(b)});}catch(e){return null}}
+window.__gerarPDF = async function gerarPDF(){
+if(!valido())return;
+const btn=$('pdf');btn.disabled=true;btn.textContent='Gerando...';
+try{
+if(!window.jspdf)throw new Error('jsPDF não carregou');
+const {jsPDF}=window.jspdf;const doc=new jsPDF({compress:true});const pageWidth=doc.internal.pageSize.getWidth();const pageHeight=doc.internal.pageSize.getHeight();
+const logo=await carregarLogo();if(logo){try{doc.addImage(logo,'PNG',15,10,28,0)}catch(e){}}
+doc.setDrawColor(200,200,200);doc.setLineWidth(0.5);doc.line(46,10,46,30);
+doc.setTextColor(0,0,0);doc.setFont('helvetica','bold');doc.setFontSize(10.5);
+doc.text('INDICAÇÃO PARA EXONERAÇÃO',52,16);doc.text('EM CARGO EM COMISSÃO',52,21);
+doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.text('Câmara Municipal de Curitiba',52,27);
+let y=45;doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text('EXCELENTÍSSIMO SENHOR PRESIDENTE DA COMISSÃO EXECUTIVA',15,y);y+=10;
+doc.setFont('helvetica','normal');doc.setFontSize(9.5);
+const texto='O (A) Vereador(a) DIEGO MARTINS indica a pessoa abaixo identificada, para que seja exonerada do Cargo em Comissão da Estrutura de Apoio à Atividade Político Parlamentar desta Câmara Municipal.';
+const splitTexto=doc.splitTextToSize(texto,pageWidth-30);doc.text(splitTexto,15,y);y+=(splitTexto.length*5)+10;
+const nome=$('nome').value.trim().toUpperCase(), mat=$('matricula').value.trim().toUpperCase(), lot=$('lotacao').value.trim().toUpperCase(), cargo=$('cargo').value.toUpperCase(), simRaw=$('simbolo').value, simNum=simRaw.startsWith('CC')?simRaw.substring(2):simRaw, simbolo='CC - '+simNum, dataVal=$('data').value;
+let dataFmt='___/___/______';if(dataVal){const [a,b,c]=dataVal.split('-');dataFmt=`${c}/${b}/${a}`}
+const rows=[['NOME:',nome],['MATRÍCULA Nº:',mat],['LOTAÇÃO:',lot],['CARGO:',cargo],['SÍMBOLO:',simbolo],['EXONERAR A PARTIR DE:',dataFmt]];
+const x0=15, w0=50, w1=pageWidth-30-50;
+doc.setFontSize(8.5);
+rows.forEach(r=>{
+const h=8;
+doc.setDrawColor(0,0,0);doc.setLineWidth(0.2);
+doc.setFillColor(250,250,250);doc.rect(x0,y,w0,h,'F');doc.rect(x0,y,w0,h);doc.rect(x0+w0,y,w1,h);
+doc.setTextColor(0,0,0);doc.setFont('helvetica','bold');doc.text(r[0],x0+2,y+5.2,{maxWidth:w0-3});
+doc.setFont('helvetica','normal');doc.text(r[1],x0+w0+2,y+5.2,{maxWidth:w1-3});
+y+=h;
+});
+y+=10;
+const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];const agora=new Date();
+doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);doc.text(`Curitiba, ${String(agora.getDate()).padStart(2,'0')} de ${meses[agora.getMonth()]} de ${agora.getFullYear()}`,pageWidth-15,y,{align:'right'});y+=30;
+doc.setDrawColor(0,0,0);doc.line(pageWidth/2-45,y,pageWidth/2+45,y);y+=5;
+doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text('VER. DIEGO MARTINS',pageWidth/2,y,{align:'center'});y+=12;
+doc.setDrawColor(180,180,180);doc.setFillColor(253,253,253);const boxY=y, boxH=32;doc.rect(15,boxY,pageWidth-30,boxH,'FD');
+doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(0,0,0);doc.text('INFORMAÇÕES IMPORTANTES',pageWidth/2,boxY+5,{align:'center'});
+doc.setFont('helvetica','normal');doc.setFontSize(8);
+const t1='Para efetivação da exoneração deverão ser entregues o Crachá Funcional (inclusive provisórios) e o Comprovante de pagamento de Auxílio Saúde equivalente aos meses recebidos e ainda não apresentados.';
+const t2='Atenção: Caso não apresente os comprovantes, as parcelas de auxílio-saúde recebidas serão descontadas do valor da rescisão do servidor.';
+doc.text(doc.splitTextToSize(t1,pageWidth-36),18,boxY+10);
+doc.setFont('helvetica','bold');doc.text(doc.splitTextToSize(t2,pageWidth-36),18,boxY+22);
+doc.setFontSize(8);doc.setTextColor(150,150,150);doc.setFont('helvetica','normal');doc.text('Página 1 de 1',pageWidth-20,pageHeight-10,{align:'right'});
+doc.save(`Formulario_Exoneracao_${nome.replace(/\s+/g,'_')||'servidor'}.pdf`);
+const m=$('msg');m.textContent='PDF gerado.';m.className='msg ok';
+}catch(err){const m=$('msg');m.textContent='Erro ao gerar PDF: '+(err.message||err);m.className='msg err';console.error(err)}
+finally{btn.disabled=!valido();btn.textContent='Gerar PDF'}
+};
+$('pdf').onclick=()=>{if(!confirm('Deseja salvar e gerar o PDF?'))return;salvarLocal();window.__gerarPDF()};
+render();
+</script>
+</body>
+</html>

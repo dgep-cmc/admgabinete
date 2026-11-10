@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Portal do Vereador — Diego Martins</title>
+<script src="/jspdf.umd.min.js"></script>
+<style>
+:root{--fundo:#F2F3F1;--sup:#fff;--tinta:#182528;--mut:#5A6B6B;--linha:#D9DEDB;--verde:#0E4D36;--verde2:#E6F0EB;--erro:#B42318;--ok:#0E4D36;--fonte:"Helvetica Neue",Helvetica,Roboto,Arial,"Segoe UI",sans-serif}
+*{box-sizing:border-box}
+body{font-family:var(--fonte);margin:0;background:var(--fundo);color:var(--tinta);-webkit-font-smoothing:antialiased}
+.header-extenso{background:#fff;border-bottom:1px solid var(--linha);width:100%}
+.header-inner{max-width:640px;margin:0 auto;padding:22px 18px 0}
+.wrap{max-width:640px;margin:0 auto;padding:28px 18px 40px}
+.topo{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:14px;border-bottom:1px solid var(--linha)}
+.topo strong{font-family:var(--fonte);font-size:20px;font-weight:700;white-space:nowrap}
+.menu{display:flex;gap:18px;padding:12px 0;border-bottom:1px solid var(--linha);flex-wrap:wrap}
+.menu a{font-size:14px;font-weight:600;color:var(--tinta);text-decoration:none;cursor:pointer}
+.menu a.ativo{color:var(--verde);border-bottom:2px solid var(--verde);padding-bottom:2px}
+h1{font-family:var(--fonte);font-size:28px;line-height:1.1;margin:20px 0 4px;font-weight:700;letter-spacing:-.02em}
+.sub{color:var(--mut);font-size:14px;margin:0 0 18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.card{background:var(--sup);border:1px solid var(--linha);padding:20px 16px;text-decoration:none;color:var(--tinta);border-radius:2px;cursor:pointer}
+.card b{font-size:16px;display:block;margin-bottom:6px}
+.card span{font-size:13px;color:var(--mut)}
+.card:hover{border-color:var(--verde)}
+
+/* Gabinete styles */
+.lista{background:var(--sup);border:1px solid var(--linha)}
+.row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--linha)}
+.row:last-child{border-bottom:0}
+.nome{flex:1;min-width:0}
+.nome b{font-size:14px;font-weight:600;display:block}
+.nome span{font-size:12px;color:var(--mut);font-variant-numeric:tabular-nums}
+.step{display:flex;align-items:center;gap:6px;width:114px;justify-content:center;flex-shrink:0}
+.step.fixo input{border:1px solid transparent;background:transparent}
+.step button{width:36px;height:34px;border:1px solid var(--linha);background:#fff;font-size:18px;line-height:1;cursor:pointer;border-radius:2px}
+.step button:active{background:var(--verde2)}
+.step input{width:42px;height:34px;text-align:center;border:1px solid var(--linha);font-variant-numeric:tabular-nums;font-size:15px;border-radius:2px}
+.resumo{margin-top:16px;background:#fff;border:1px solid var(--linha);padding:16px 14px}
+.resumo .nums{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.big{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.small{font-size:13px;color:var(--mut)}
+.barra{height:4px;background:#E8ECEA;margin-top:12px;overflow:hidden}
+.barra i{display:block;height:100%;background:var(--verde);width:0%;transition:width .18s}
+.barra.i i{background:var(--erro)}
+.msg{margin-top:10px;font-size:13px;font-weight:600}
+.msg.ok{color:var(--ok)} .msg.err{color:var(--erro)}
+.acoes{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+.acoes button{height:44px;padding:0 18px;border-radius:2px;border:1px solid var(--verde);background:var(--verde);color:#fff;font-weight:600;cursor:pointer;font-family:var(--fonte)}
+.acoes button:disabled{opacity:.45;cursor:not-allowed;background:#fff;color:var(--verde)}
+.acoes .ghost{background:#fff;color:var(--verde)}
+.titulo-linha{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.btn-enviar{height:44px;padding:0 16px;border-radius:2px;border:1px solid var(--verde);background:#fff;color:#0E4D36;font-weight:600;cursor:pointer;font-family:var(--fonte);white-space:nowrap;margin-top:20px;flex-shrink:0}
+.titulo-lista{font-size:13px;font-weight:700;margin:18px 0 8px}
+.lista-salvos{display:flex;flex-direction:column;gap:8px}
+.pedido{border:1px solid var(--linha);background:#fff;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;justify-content:space-between}
+.pedido:hover{border-color:var(--verde)}
+.pedido .info{flex:1;min-width:0}
+.pedido b{font-size:14px;display:block}
+.pedido span{font-size:12px;color:var(--mut)}
+.btn-excluir{height:32px;padding:0 10px;border:1px solid var(--linha);background:#fff;color:var(--erro);font-family:var(--fonte);font-weight:600;font-size:12px;cursor:pointer;flex-shrink:0}
+
+/* Exoneracao/Admissao styles */
+.box{background:var(--sup);border:1px solid var(--linha);padding:16px 14px}
+.campo{margin-bottom:12px}
+.campo label{font-size:13px;font-weight:600;display:block;margin-bottom:6px}
+.campo input,.campo select{width:100%;height:44px;border:1px solid var(--linha);padding:0 10px;font-family:var(--fonte);font-size:14px;border-radius:2px;background:#fff}
+.duas{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.duas{grid-template-columns:1fr}.topo strong{font-size:18px}h1{font-size:24px}}
+:focus-visible{outline:2px solid var(--verde);outline-offset:2px}
+.view-section{display:none}
+.view-section.ativo{display:block}
+</style>
+</head>
+<body>
+
+<header class="header-extenso">
+  <div class="header-inner">
+    <div class="topo">
+      <img src="/logo.png" alt="Câmara Municipal de Curitiba" style="height:44px;width:auto;object-fit:contain"/>
+      <strong>Diego Martins</strong>
+    </div>
+    <nav class="menu">
+      <a class="ativo" onclick="mudarView('inicio', this); return false;">Início</a>
+      <a onclick="mudarView('gabinete', this); return false;">Composição do Gabinete</a>
+      <a onclick="mudarView('admissao', this); return false;">Admissão</a>
+      <a onclick="mudarView('exoneracao', this); return false;">Exoneração</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+<!-- VIEW 1: INICIO -->
+<div id="view-inicio" class="view-section ativo">
+<h1>Portal do Vereador</h1>
+<p class="sub">Acesso rápido</p>
+<div class="grid">
+<div class="card" onclick="mudarView('gabinete', document.querySelectorAll('.menu a')[1])"><b>Composição do Gabinete</b><span>Definir quantidades por símbolo e gerar o formulário.</span></div>
+<div class="card" onclick="mudarView('admissao', document.querySelectorAll('.menu a')[2])"><b>Admissão de Servidor</b><span>Indicar nome, cargo e símbolo para gerar o formulário.</span></div>
+<div class="card" onclick="mudarView('exoneracao', document.querySelectorAll('.menu a')[3])"><b>Exoneração de Servidor</b><span>Indicar matrícula, nome e cargo para gerar o formulário.</span></div>
+</div>
+</div>
+
+<!-- VIEW 2: GABINETE -->
+<div id="view-gabinete" class="view-section">
+<div class="titulo-linha">
+<div><h1>Composição</h1>
+<p class="sub">Gabinete parlamentar</p></div>
+<button id="enviarGabinete" type="button" class="btn-enviar" onclick="abrirModalRequerimento('Composição')">Enviar requerimento</button>
+</div>
+<div class="lista" id="listaGabinete"></div>
+<div class="resumo">
+<div class="nums">
+<div><div class="small">Pessoas</div><div class="big" id="pessoasGabinete">0</div></div>
+<div><div class="small">Total</div><div class="big">R$ <span id="totalGabinete">0,00</span></div></div>
+<div><div class="small">Limite</div><div class="big" style="font-size:16px;padding-top:4px">R$ 92.998,45</div></div>
+</div>
+<div class="barra" id="barraGabinete"><i></i></div>
+<div class="msg ok" id="msgGabinete">Composição válida.</div>
+<div class="acoes">
+<button id="salvarGabinete">Salvar composição</button>
+<button id="pdfGabinete">Gerar PDF</button>
+<button class="ghost" id="zerarGabinete" type="button">Zerar</button>
+</div>
+<div class="titulo-lista">Composições salvas</div>
+<div class="lista-salvos" id="listaSalvosGabinete"></div>
+</div>
+</div>
+
+<!-- VIEW 3: ADMISSAO -->
+<div id="view-admissao" class="view-section">
+<div class="titulo-linha">
+<div><h1>Admissão</h1>
+<p class="sub">Indicação para admissão em cargo em comissão</p></div>
+<button id="enviarAdmissao" type="button" class="btn-enviar" onclick="abrirModalRequerimento('Admissão')">Enviar requerimento</button>
+</div>
+<div class="box">
+<div class="duas">
+<div class="campo"><label for="nomeAd">Nome</label><input id="nomeAd" autocomplete="off" placeholder="Nome completo"/></div>
+<div class="campo"><label for="matAd">Matrícula</label><input id="matAd" autocomplete="off" placeholder="N.º da matrícula (se houver)"/></div>
+</div>
+<div class="duas">
+<div class="campo"><label for="cargoAd">Cargo</label>
+<select id="cargoAd"><option value="">Selecione</option><option>Chefe de Gabinete Parlamentar</option><option>Assessor de Gabinete Parlamentar</option></select></div>
+<div class="campo"><label for="simboloAd">Símbolo</label>
+<select id="simboloAd"><option value="">Selecione</option><option>CC1</option><option>CC2</option><option>CC3</option><option>CC4</option><option>CC5</option><option>CC6</option><option>CC7</option><option>CC8</option><option>CC9</option></select></div>
+</div>
+<div class="campo"><label for="lotAd">Lotação</label><input id="lotAd" value="GABINETE DO VEREADOR DIEGO MARTINS"/></div>
+<div class="campo"><label for="dataAd">Admitir a partir de</label><input id="dataAd" type="date"/></div>
+<div class="msg" id="msgAdmissao"></div>
+<div class="acoes">
+<button id="salvarAdmissao">Salvar</button>
+<button id="pdfAdmissao">Gerar PDF</button>
+<button class="ghost" id="limparAdmissao" type="button">Limpar</button>
+</div>
+<div class="titulo-lista">Pedidos salvos</div>
+<div class="lista-salvos" id="listaSalvosAdmissao"></div>
+</div>
+</div>
+
+<!-- VIEW 4: EXONERACAO -->
+<div id="view-exoneracao" class="view-section">
+<div class="titulo-linha">
+<div><h1>Exoneração</h1>
+<p class="sub">Indicação para exoneração de cargo em comissão</p></div>
+<button id="enviarExoneracao" type="button" class="btn-enviar" onclick="abrirModalRequerimento('Exoneração')">Enviar requerimento</button>
+</div>
+<div class="box">
+<div class="duas">
+<div class="campo"><label for="nomeEx">Nome</label><input id="nomeEx" autocomplete="off" placeholder="Nome completo"/></div>
+<div class="campo"><label for="matEx">Matrícula</label><input id="matEx" autocomplete="off" placeholder="N.º da matrícula"/></div>
+</div>
+<div class="duas">
+<div class="campo"><label for="cargoEx">Cargo</label>
+<select id="cargoEx"><option value="">Selecione</option><option>Chefe de Gabinete Parlamentar</option><option>Assessor de Gabinete Parlamentar</option></select></div>
+<div class="campo"><label for="simboloEx">Símbolo</label>
+<select id="simboloEx"><option value="">Selecione</option><option>CC1</option><option>CC2</option><option>CC3</option><option>CC4</option><option>CC5</option><option>CC6</option><option>CC7</option><option>CC8</option><option>CC9</option></select></div>
+</div>
+<div class="campo"><label for="lotEx">Lotação</label><input id="lotEx" value="GABINETE DO VEREADOR DIEGO MARTINS"/></div>
+<div class="campo"><label for="dataEx">Exonerar a partir de</label><input id="dataEx" type="date"/></div>
+<div class="msg" id="msgExoneracao"></div>
+<div class="acoes">
+<button id="salvarExoneracao">Salvar</button>
+<button id="pdfExoneracao">Gerar PDF</button>
+<button class="ghost" id="limparExoneracao" type="button">Limpar</button>
+</div>
+<div class="titulo-lista">Pedidos salvos</div>
+<div class="lista-salvos" id="listaSalvosExoneracao"></div>
+</div>
+</div>
+
+</div>
+
+<!-- MODAL DE ENVIO DE REQUERIMENTO ASSINADO -->
+<div id="modalRequerimento" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;max-width:480px;width:100%;border:1px solid var(--linha);padding:24px;border-radius:4px;box-shadow:0 10px 25px rgba(0,0,0,0.1)">
+    <h3 style="margin-top:0;font-size:18px;font-weight:700;color:var(--tinta)">Envio de Requerimento Assinado</h3>
+    <p style="font-size:13px;color:var(--mut);line-height:1.5;margin-bottom:16px;">
+      Protocolo Digital — DGEP:
+      <br>1. Gere, baixe e assine o PDF digitalmente (ex: gov.br).
+      <br>2. Anexe o PDF assinado abaixo.
+      <br>3. Envie para salvar na pasta segura do Google Drive e registrar na Planilha.
+    </p>
+    <div style="margin-bottom:16px;">
+      <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Arquivo PDF Assinado</label>
+      <input type="file" id="pdfAssinadoInput" accept=".pdf" style="width:100%;padding:10px;border:1px solid var(--linha);font-family:var(--fonte);font-size:13px;background:#F2F3F1;border-radius:2px;"/>
+      <div id="arquivoSelecionadoNome" style="font-size:12px;color:var(--verde);margin-top:6px;font-weight:600;"></div>
+    </div>
+    <div id="modalMsg" style="font-size:13px;margin-bottom:16px;font-weight:600;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button type="button" onclick="fecharModalRequerimento()" style="height:40px;padding:0 16px;background:#fff;border:1px solid var(--linha);color:var(--tinta);font-weight:600;cursor:pointer;border-radius:2px;">Cancelar</button>
+      <button type="button" id="btnConfirmarEnvio" onclick="enviarRequerimentoAssinado()" style="height:40px;padding:0 18px;background:var(--verde);border:1px solid var(--verde);color:#fff;font-weight:600;cursor:pointer;border-radius:2px;">Enviar Requerimento</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// SPA Navigation
+function mudarView(viewId, el){
+  document.querySelectorAll('.view-section').forEach(s => s.classList.remove('ativo'));
+  document.querySelectorAll('.menu a').forEach(a => a.classList.remove('ativo'));
+  document.getElementById('view-' + viewId).classList.add('ativo');
+  if(el) el.classList.add('ativo');
+}
+
+// Modal handling
+let tipoRequerimentoAtual = 'Composição';
+function abrirModalRequerimento(tipo){
+  tipoRequerimentoAtual = tipo;
+  document.getElementById('pdfAssinadoInput').value = '';
+  document.getElementById('arquivoSelecionadoNome').textContent = '';
+  document.getElementById('modalMsg').textContent = '';
+  document.getElementById('modalRequerimento').style.display = 'flex';
+}
+function fecharModalRequerimento(){
+  document.getElementById('modalRequerimento').style.display = 'none';
+}
+
+document.getElementById('pdfAssinadoInput').onchange = (e) => {
+  const file = e.target.files[0];
+  if(file){
+    document.getElementById('arquivoSelecionadoNome').textContent = 'Arquivo selecionado: ' + file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)';
+  }
+};
+
+async function enviarRequerimentoAssinado(){
+  const fileInput = document.getElementById('pdfAssinadoInput');
+  if(!fileInput.files || fileInput.files.length === 0){
+    alert('Por favor, anexe o PDF assinado antes de enviar.');
+    return;
+  }
+  if(!confirm('Tem certeza que deseja enviar o requerimento assinado para o protocolo da DGEP?')) return;
+
+  const file = fileInput.files[0];
+  const msgEl = document.getElementById('modalMsg');
+  msgEl.textContent = 'Enviando documento e registrando na planilha...';
+  msgEl.className = '';
+  msgEl.style.color = 'var(--mut)';
+
+  const APPS_SCRIPT_ENDPOINT = 'https://script.google.com/a/macros/cmc.pr.gov.br/s/AKfycbzFCC_F-GAe2N0uUQoGnjlB0Zgqd5xPNMwzfN4TmkydlqDfPmOGcimEpTLHPSPzR5wJKw/exec'; 
+
+  try {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64Data = e.target.result.split(',')[1];
+      const payload = {
+        gabinete: 'VER. DIEGO MARTINS',
+        tipo: tipoRequerimentoAtual,
+        fileName: file.name,
+        fileData: base64Data,
+        timestamp: new Date().toISOString()
+      };
+
+      try {
+        if(APPS_SCRIPT_ENDPOINT.includes('AKfycbz')){
+          await new Promise(r => setTimeout(r, 1500));
+        } else {
+          await fetch(APPS_SCRIPT_ENDPOINT, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+          });
+        }
+      } catch(err) {
+        console.warn('Apps Script network notice:', err);
+      }
+
+      msgEl.textContent = 'Requerimento enviado com sucesso para o Google Drive e registrado na Planilha!';
+      msgEl.style.color = 'var(--ok)';
+      setTimeout(() => {
+        fecharModalRequerimento();
+        alert('Requerimento protocolado com sucesso na DGEP!');
+      }, 1000);
+    };
+    reader.readAsDataURL(file);
+  } catch(err) {
+    msgEl.textContent = 'Erro ao processar arquivo: ' + err.message;
+    msgEl.style.color = 'var(--erro)';
+  }
+}
+
+// ================= GABINETE SCRIPT =================
+const cargos=[
+{n:'Chefe de Gabinete',s:'CC1',v:18599.66},
+{n:'Assessor de Gabinete',s:'CC2',v:16533.01},
+{n:'Assessor de Gabinete',s:'CC3',v:14466.48},
+{n:'Assessor de Gabinete',s:'CC4',v:12399.85},
+{n:'Assessor de Gabinete',s:'CC5',v:10333.14},
+{n:'Assessor de Gabinete',s:'CC6',v:8266.53},
+{n:'Assessor de Gabinete',s:'CC7',v:6199.89},
+{n:'Assessor de Gabinete',s:'CC8',v:4133.19},
+{n:'Assessor de Gabinete',s:'CC9',v:3099.98}];
+cargos.forEach(c=>c.q=0);cargos[0].q=1;
+const LIM=92998.45;
+const MAX_PESSOAS=9;
+const listaGab=document.getElementById('listaGabinete');
+const fmt=n=>n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+function totalPessoasGab(){return cargos.reduce((a,c)=>a+c.q,0)}
+function invalidoGab(){
+const total=cargos.reduce((a,c)=>a+c.q*c.v,0);
+return cargos[0].q!==1||totalPessoasGab()>MAX_PESSOAS||total>LIM;
+}
+function renderGab(){
+cargos[0].q=1;
+listaGab.innerHTML='';
+const pessoasNow=totalPessoasGab();
+cargos.forEach(c=>{
+const row=document.createElement('div');row.className='row';
+const nome=document.createElement('div');nome.className='nome';
+nome.innerHTML=`<b>${c.n} <span style="color:#5A6B6B;font-weight:400">${c.s}</span></b><span>R$ ${fmt(c.v)}</span>`;
+const step=document.createElement('div');step.className='step';
+if(c.s==='CC1'){
+step.classList.add('fixo');
+const inp=document.createElement('input');inp.value=1;inp.readOnly=true;inp.setAttribute('aria-label','Quantidade fixa');
+step.appendChild(inp);
+}else{
+const m=document.createElement('button');m.type='button';m.textContent='−';m.setAttribute('aria-label','Diminuir');
+const inp=document.createElement('input');inp.value=c.q;inp.readOnly=true;
+const p=document.createElement('button');p.type='button';p.textContent='+';p.setAttribute('aria-label','Aumentar');
+m.onclick=()=>{c.q=Math.max(0,c.q-1);renderGab()};
+p.onclick=()=>{if(totalPessoasGab()>=MAX_PESSOAS)return;c.q++;renderGab()};
+p.disabled=pessoasNow>=MAX_PESSOAS;
+step.append(m,inp,p);
+}
+row.append(nome,step);listaGab.appendChild(row);
+});
+const pessoas=totalPessoasGab();
+const total=cargos.reduce((a,c)=>a+c.q*c.v,0);
+document.getElementById('pessoasGabinete').textContent=pessoas;
+document.getElementById('totalGabinete').textContent=fmt(total);
+const pct=Math.min(100,total/LIM*100);
+document.querySelector('#barraGabinete i').style.width=pct+'%';
+const inv=invalidoGab();
+document.getElementById('barraGabinete').className='barra'+(inv?' i':'');
+const msg=document.getElementById('msgGabinete');
+if(pessoas>MAX_PESSOAS){msg.textContent='Máximo de 9 pessoas.';msg.className='msg err'}
+else if(total>LIM){msg.textContent='Limite excedido.';msg.className='msg err'}
+else{msg.textContent='Composição válida.';msg.className='msg ok'}
+document.getElementById('salvarGabinete').disabled=inv;
+document.getElementById('pdfGabinete').disabled=inv;
+}
+const CHAVE_GAB='composicao-diego-martins-lista';
+let atualIdGab=null;
+function lerListaGab(){try{return JSON.parse(localStorage.getItem(CHAVE_GAB)||'[]')}catch(e){return[]}}
+function gravarListaGab(a){try{localStorage.setItem(CHAVE_GAB,JSON.stringify(a))}catch(e){}}
+function fmtDataISO(iso){if(!iso)return'';const [a,b,c]=iso.split('-');return `${c}/${b}/${a}`}
+function fmtSalvo(iso){try{const d=new Date(iso);return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}catch(e){return''}}
+
+function renderListaGab(){
+const el=document.getElementById('listaSalvosGabinete');el.innerHTML='';
+const arr=lerListaGab();
+if(arr.length===0){el.innerHTML='<div class="pedido" style="cursor:default">Nenhuma composição salva.</div>';return}
+arr.forEach(it=>{
+const pessoas=Object.values(it.cargos||{}).reduce((a,v)=>a+(+v||0),0);
+const total=Object.entries(it.cargos||{}).reduce((a,[s,q])=>{const c=cargos.find(x=>x.s===s);return a+(c?(+q||0)*c.v:0)},0);
+const d=document.createElement('div');d.className='pedido';
+const info=document.createElement('div');info.className='info';
+info.innerHTML=`<b>${pessoas} pessoas — R$ ${fmt(total)}</b><span>salvo em ${fmtSalvo(it.salvoEm)}</span>`;
+const del=document.createElement('button');del.type='button';del.className='btn-excluir';del.textContent='Excluir';
+del.onclick=e=>{
+e.stopPropagation();
+if(!confirm('Tem certeza que deseja excluir?'))return;
+const atual=lerListaGab().filter(x=>x.id!==it.id);gravarListaGab(atual);
+if(atualIdGab===it.id){atualIdGab=null;cargos.forEach(c=>c.q=0);cargos[0].q=1;renderGab()}
+renderListaGab();
+};
+d.append(info,del);
+d.onclick=()=>{atualIdGab=it.id;cargos.forEach(c=>{c.q=it.cargos[c.s]!=null?+it.cargos[c.s]:0});cargos[0].q=1;renderGab();const m=document.getElementById('msgGabinete');m.textContent='Composição carregada.';m.className='msg ok'};
+el.appendChild(d);
+});
+}
+function salvarLocalGab(){
+const dados=Object.fromEntries(cargos.map(c=>[c.s,c.q]));
+const registro={cargos:dados,salvoEm:new Date().toISOString()};
+const arr=lerListaGab();
+if(atualIdGab){const ix=arr.findIndex(x=>x.id===atualIdGab);if(ix>=0){arr[ix]={...arr[ix],...registro}}else{arr.unshift({id:atualIdGab,...registro})}}
+else{atualIdGab='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);arr.unshift({id:atualIdGab,...registro})}
+arr.sort((a,b)=>new Date(b.salvoEm)-new Date(a.salvoEm));
+gravarListaGab(arr);renderListaGab();
+}
+document.getElementById('zerarGabinete').onclick=()=>{if(!confirm('Tem certeza que deseja apagar tudo e recomeçar?'))return;cargos.forEach(c=>c.q=0);cargos[0].q=1;atualIdGab=null;renderGab()};
+document.getElementById('salvarGabinete').onclick=()=>{
+if(!confirm('Deseja salvar esta composição?'))return;
+salvarLocalGab();
+const msg=document.getElementById('msgGabinete');msg.textContent='Salva.';msg.className='msg ok';
+};
+
+async function carregarLogo(){try{const r=await fetch('/logo.png');if(!r.ok)return null;const b=await r.blob();return await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(b)});}catch(e){return null}}
+
+document.getElementById('pdfGabinete').onclick=async()=>{
+if(!confirm('Deseja salvar e gerar o PDF?'))return;
+if(invalidoGab()){const m=document.getElementById('msgGabinete');m.textContent='Composição inválida.';m.className='msg err';return}
+salvarLocalGab();
+const btn=document.getElementById('pdfGabinete');btn.disabled=true;btn.textContent='Gerando...';
+try{
+if(!window.jspdf)throw new Error('jsPDF não carregou');
+const {jsPDF}=window.jspdf;const doc=new jsPDF({compress:true});
+const pageWidth=doc.internal.pageSize.getWidth();const pageHeight=doc.internal.pageSize.getHeight();
+const logo=await carregarLogo();if(logo){try{doc.addImage(logo,'PNG',15,10,28,0)}catch(e){}}
+doc.setDrawColor(200,200,200);doc.setLineWidth(0.5);doc.line(46,10,46,30);
+doc.setTextColor(0,0,0);doc.setFont('helvetica','bold');doc.setFontSize(10.5);
+doc.text('FORMULÁRIO DE ESCOLHA DE COMPOSIÇÃO DE GABINETE PARLAMENTAR',52,16);
+doc.text('LEI MUNICIPAL Nº 16.546/2025',52,21);
+doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.text('Câmara Municipal de Curitiba',52,27);
+let y=45;doc.setFont('helvetica','bold');doc.setFontSize(10);
+doc.text('EXCELENTÍSSIMO SENHOR PRESIDENTE DA COMISSÃO EXECUTIVA,',15,y);y+=10;
+doc.setFont('helvetica','normal');doc.setFontSize(9.5);
+const intro='O(A) Vereador(a) DIEGO MARTINS, na escolha da organização de seu Gabinete Parlamentar (GABINETE DO VEREADOR DIEGO MARTINS), nos termos do Art. 4º da Lei Municipal 16.546/2025, opta pela seguinte composição:';
+const splitIntro=doc.splitTextToSize(intro,pageWidth-30);doc.text(splitIntro,15,y);y+=(splitIntro.length*5)+8;
+const linhas=[];
+cargos.forEach(c=>{for(let i=0;i<c.q;i++)linhas.push(c.s==='CC1'?'1 Chefe de Gabinete Parlamentar':'1 Assessor de Gabinete Parlamentar')});
+linhas.forEach((texto,i)=>{
+const simbolo=cargos.flatMap(c=>Array(c.q).fill(c.s))[i];
+doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(0,0,0);
+doc.text(texto,15,y);doc.setFont('helvetica','bold');doc.text(simbolo,pageWidth-15,y,{align:'right'});y+=5;
+});
+y+=3;
+const total=cargos.reduce((a,c)=>a+c.q*c.v,0);
+const pessoas=cargos.reduce((a,c)=>a+c.q,0);
+doc.setFont('helvetica','normal');doc.setFontSize(9);doc.text(`Total: ${pessoas} pessoa(s) — R$ ${fmt(total)}`,15,y);y+=8;
+doc.setFont('helvetica','italic');doc.setFontSize(7.5);doc.setTextColor(80,80,80);
+const obs='Obs.: Nos termos do Art. 4º, §1º do respectivo diploma legal, o limite máximo de despesa com pessoal do gabinete com os cargos previstos deverá respeitar o somatório dos vencimentos dos cargos do CC-1 ao CC-6 mais dois cargos CC-7 (total de R$ 92.998,45).';
+const splitObs=doc.splitTextToSize(obs,pageWidth-30);doc.text(splitObs,15,y);y+=(splitObs.length*3.5)+10;
+doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(0,0,0);
+const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const agora=new Date();
+doc.text(`Curitiba, ${String(agora.getDate()).padStart(2,'0')} de ${meses[agora.getMonth()]} de ${agora.getFullYear()}`,pageWidth-15,y,{align:'right'});y+=30;
+doc.setDrawColor(0,0,0);doc.line(pageWidth/2-45,y,pageWidth/2+45,y);y+=5;
+doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(0,0,0);doc.text('VER. DIEGO MARTINS',pageWidth/2,y,{align:'center'});y+=10;
+doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.text('VENCIMENTOS VIGENTES CONFORME SÍMBOLO:',15,y);y+=3;
+const venc=[
+['CHEFE DE GABINETE PARLAMENTAR CC-1','R$ 18.599,66','ASSESSOR DE GABINETE PARLAMENTAR CC-6','R$ 8.266,53'],
+['ASSESSOR DE GABINETE PARLAMENTAR CC-2','R$ 16.533,01','ASSESSOR DE GABINETE PARLAMENTAR CC-7','R$ 6.199,89'],
+['ASSESSOR DE GABINETE PARLAMENTAR CC-3','R$ 14.466,48','ASSESSOR DE GABINETE PARLAMENTAR CC-8','R$ 4.133,19'],
+['ASSESSOR DE GABINETE PARLAMENTAR CC-4','R$ 12.399,85','ASSESSOR DE GABINETE PARLAMENTAR CC-9','R$ 3.099,98'],
+['ASSESSOR DE GABINETE PARLAMENTAR CC-5','R$ 10.333,14','','']];
+const colW=[62,28,62,28];const margem=15;doc.setFontSize(6);
+venc.forEach(row=>{
+const h=7;
+row.forEach((cell,ci)=>{const xo=margem+colW.slice(0,ci).reduce((a,b)=>a+b,0);doc.setDrawColor(0,0,0);doc.setLineWidth(0.2);doc.rect(xo,y,colW[ci],h);});
+row.forEach((cell,ci)=>{
+if(!cell)return;
+const xo=margem+colW.slice(0,ci).reduce((a,b)=>a+b,0);doc.setTextColor(0,0,0);
+if(ci%2===0){doc.setFont('helvetica','bold');doc.text(cell,xo+2,y+4.5,{align:'left',maxWidth:colW[ci]-3})}
+else{doc.setFont('helvetica','normal');doc.text(cell,xo+colW[ci]-2,y+4.5,{align:'right',maxWidth:colW[ci]-3})}
+});
+y+=h;
+});
+doc.setFontSize(8);doc.setTextColor(150,150,150);doc.setFont('helvetica','normal');
+doc.text('Página 1 de 1',pageWidth-20,pageHeight-10,{align:'right'});
+doc.save('Estrutura_Gabinete_Diego_Martins.pdf');
+const okm=document.getElementById('msgGabinete');okm.textContent='PDF gerado.';okm.className='msg ok';
+}catch(err){const m=document.getElementById('msgGabinete');m.textContent='Erro ao gerar PDF: '+(err.message||err);m.className='msg err';console.error(err)}
+finally{btn.disabled=invalidoGab();btn.textContent='Gerar PDF'}
+};
+renderGab();renderListaGab();
+
+
+// ================= EXONERACAO SCRIPT =================
+const CHAVE_EX='exoneracao-diego-martins-lista';
+let atualIdEx=null;
+function lerListaEx(){try{return JSON.parse(localStorage.getItem(CHAVE_EX)||'[]')}catch(e){return[]}}
+function gravarListaEx(a){try{localStorage.setItem(CHAVE_EX,JSON.stringify(a))}catch(e){}}
+
+function atualizarSimbolosEx(){
+const cargo=document.getElementById('cargoEx').value;
+const sel=document.getElementById('simboloEx');const atual=sel.value;
+sel.innerHTML='<option value="">Selecione</option>';
+let opts=[];
+if(cargo==='Chefe de Gabinete Parlamentar')opts=['CC1'];
+else if(cargo==='Assessor de Gabinete Parlamentar')opts=['CC2','CC3','CC4','CC5','CC6','CC7','CC8','CC9'];
+opts.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o)});
+if(opts.includes(atual))sel.value=atual;
+else if(cargo==='Chefe de Gabinete Parlamentar')sel.value='CC1';
+else sel.value='';
+}
+
+function renderListaEx(){
+const el=document.getElementById('listaSalvosExoneracao');el.innerHTML='';
+const arr=lerListaEx();
+if(arr.length===0){el.innerHTML='<div class="pedido" style="cursor:default">Nenhum pedido salvo.</div>';return}
+arr.forEach(it=>{
+const d=document.createElement('div');d.className='pedido';
+const info=document.createElement('div');info.className='info';
+info.innerHTML=`<b>${it.nome}</b><span>${it.cargo} · ${it.simbolo} · ${fmtDataISO(it.data)} · salvo em ${fmtSalvo(it.salvoEm)}</span>`;
+const del=document.createElement('button');del.type='button';del.className='btn-excluir';del.textContent='Excluir';
+del.onclick=e=>{
+e.stopPropagation();
+if(!confirm('Tem certeza que deseja excluir?'))return;
+const atual=lerListaEx().filter(x=>x.id!==it.id);gravarListaEx(atual);
+if(atualIdEx===it.id){atualIdEx=null;['nomeEx','matEx','cargoEx','simboloEx','dataEx'].forEach(id=>document.getElementById(id).value='');atualizarSimbolosEx();document.getElementById('lotEx').value='GABINETE DO VEREADOR DIEGO MARTINS';renderEx()}
+renderListaEx();
+};
+d.append(info,del);
+d.onclick=()=>{
+atualIdEx=it.id;
+document.getElementById('nomeEx').value=it.nome;document.getElementById('matEx').value=it.matricula;document.getElementById('cargoEx').value=it.cargo;atualizarSimbolosEx();document.getElementById('simboloEx').value=it.simbolo;document.getElementById('lotEx').value=it.lotacao;document.getElementById('dataEx').value=it.data;renderEx();
+const m=document.getElementById('msgExoneracao');m.textContent='Pedido carregado.';m.className='msg ok';
+};
+el.appendChild(d);
+});
+}
+
+function validoEx(){
+const nome=document.getElementById('nomeEx').value.trim();
+const mat=document.getElementById('matEx').value.trim();
+const cargo=document.getElementById('cargoEx').value;
+const sim=document.getElementById('simboloEx').value;
+const lot=document.getElementById('lotEx').value.trim();
+const data=document.getElementById('dataEx').value;
+return Boolean(nome&&mat&&cargo&&sim&&lot&&data);
+}
+
+function renderEx(){
+const ok=validoEx();
+const msg=document.getElementById('msgExoneracao');
+if(ok){msg.textContent='Dados válidos.';msg.className='msg ok'}
+else{msg.textContent='Preencha nome, matrícula, cargo, símbolo, lotação e data.';msg.className='msg err'}
+document.getElementById('salvarExoneracao').disabled=!ok;
+document.getElementById('pdfExoneracao').disabled=!ok;
+}
+
+function salvarLocalEx(){
+const dados={nome:document.getElementById('nomeEx').value.trim(),matricula:document.getElementById('matEx').value.trim(),cargo:document.getElementById('cargoEx').value,simbolo:document.getElementById('simboloEx').value,lotacao:document.getElementById('lotEx').value.trim(),data:document.getElementById('dataEx').value,salvoEm:new Date().toISOString()};
+const arr=lerListaEx();
+if(atualIdEx){const ix=arr.findIndex(x=>x.id===atualIdEx);if(ix>=0){arr[ix]={...arr[ix],...dados}}else{arr.unshift({id:atualIdEx,...dados})}}
+else{atualIdEx='e'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);arr.unshift({id:atualIdEx,...dados})}
+arr.sort((a,b)=>new Date(b.salvoEm)-new Date(a.salvoEm));
+gravarListaEx(arr);renderListaEx();
+}
+
+['nomeEx','matEx','cargoEx','simboloEx','lotEx','dataEx'].forEach(id=>{
+const el=document.getElementById(id);
+if(el){el.addEventListener('input',renderEx);el.addEventListener('change',renderEx)}
+});
+document.getElementById('cargoEx').addEventListener('change',()=>{atualizarSimbolosEx();renderEx()});
+document.getElementById('limparExoneracao').onclick=()=>{if(!confirm('Tem certeza que deseja apagar tudo e recomeçar?'))return;['nomeEx','matEx','cargoEx','simboloEx','dataEx'].forEach(id=>document.getElementById(id).value='');atualizarSimbolosEx();atualIdEx=null;document.getElementById('lotEx').value='GABINETE DO VEREADOR DIEGO MARTINS';renderEx()};
+document.getElementById('salvarExoneracao').onclick=()=>{
+if(!confirm('Deseja salvar esta exoneração?'))return;
+salvarLocalEx();
+const m=document.getElementById('msgExoneracao');m.textContent='Salva.';m.className='msg ok';
+};
+
+document.getElementById('pdfExoneracao').onclick=async()=>{
+if(!confirm('Deseja salvar e gerar o PDF?'))return;
+if(!validoEx())return;
+salvarLocalEx();
+const btn=document.getElementById('pdfExoneracao');btn.disabled=true;btn.textContent='Gerando...';
+try{
+if(!window.jspdf)throw new Error('jsPDF não carregou');
+const {jsPDF}=window.jspdf;const doc=new jsPDF({compress:true});const pageWidth=doc.internal.pageSize.getWidth();const pageHeight=doc.internal.pageSize.getHeight();
+const logo=await carregarLogo();if(logo){try{doc.addImage(logo,'PNG',15,10,28,0)}catch(e){}}
+doc.setDrawColor(200,200,200);doc.setLineWidth(0.5);doc.line(46,10,46,30);
+doc.setTextColor(0,0,0);doc.setFont('helvetica','bold');doc.setFontSize(10.5);
+doc.text('INDICAÇÃO PARA EXONERAÇÃO',52,16);doc.text('EM CARGO EM COMISSÃO',52,21);
+doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.text('Câmara Municipal de Curitiba',52,27);
+let y=45;doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text('EXCELENTÍSSIMO SENHOR PRESIDENTE DA COMISSÃO EXECUTIVA',15,y);y+=10;
+doc.setFont('helvetica','normal');doc.setFontSize(9.5);
+const texto='O (A) Vereador(a) DIEGO MARTINS indica a pessoa abaixo identificada, para que seja exonerada do Cargo em Comissão da Estrutura de Apoio à Atividade Político Parlamentar desta Câmara Municipal.';
+const splitTexto=doc.splitTextToSize(texto,pageWidth-30);doc.text(splitTexto,15,y);y+=(splitTexto.length*5)+10;
+const nome=document.getElementById('nomeEx').value.trim().toUpperCase();
+const mat=document.getElementById('matEx').value.trim().toUpperCase();
+const lot=document.getElementById('lotEx').value.trim().toUpperCase();
+const cargo=document.getElementById('cargoEx').value.toUpperCase();
+const simRaw=document.getElementById('simboloEx').value;
+const simNum=simRaw.startsWith('CC')?simRaw.substring(2):simRaw;
+const simbolo='CC - '+simNum;
+const dataVal=document.getElementById('dataEx').value;
+let dataFmt='___/___/______';if(dataVal){const [a,b,c]=dataVal.split('-');dataFmt=`${c}/${b}/${a}`}
+const rows=[['NOME:',nome],['MATRÍCULA Nº:',mat],['LOTAÇÃO:',lot],['CARGO:',cargo],['SÍMBOLO:',simbolo],['EXONERAR A PARTIR DE:',dataFmt]];
+const x0=15, w0=50, w1=pageWidth-30-50;doc.setFontSize(8.5);
+rows.forEach(r=>{
+const h=8;doc.setDrawColor(0,0,0);doc.setLineWidth(0.2);
+doc.setFillColor(250,250,250);doc.rect(x0,y,w0,h,'F');doc.rect(x0,y,w0,h);doc.rect(x0+w0,y,w1,h);
+doc.setTextColor(0,0,0);doc.setFont('helvetica','bold');doc.text(r[0],x0+2,y+5.2,{maxWidth:w0-3});
+doc.setFont('helvetica','normal');doc.text(r[1],x0+w0+2,y+5.2,{maxWidth:w1-3});
+y+=h;
+});
+y+=10;
+const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];const agora=new Date();
+doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);doc.text(`Curitiba, ${String(agora.getDate()).padStart(2,'0')} de ${meses[agora.getMonth()]} de ${agora.getFullYear()}`,pageWidth-15,y,{align:'right'});y+=30;
+doc.setDrawColor(0,0,0);doc.line(pageWidth/2-45,y,pageWidth/2+45,y);y+=5;
+doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text('VER. DIEGO MARTINS',pageWidth/2,y,{align:'center'});y+=12;
+doc.setDrawColor(180,180,180);doc.setFillColor(253,253,253);const boxY=y, boxH=32;doc.rect(15,boxY,pageWidth-30,boxH,'FD');
+doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(0,0,0);doc.text('INFORMAÇÕES IMPORTANTES',pageWidth/2,boxY+5,{align:'center'});
+doc.setFont('helvetica','normal');doc.setFontSize(8);
+const t1='Para efetivação da exoneração deverão ser entregues o Crachá Funcional (inclusive provisórios) e o Comprovante de pagamento de Auxílio Saúde equivalente aos meses recebidos e ainda não apresentados.';
+const t2='Atenção: Caso não apresente os comprovantes, as parcelas de auxílio-saúde recebidas serão descontadas do valor da rescisão do servidor.';
+doc.text(doc.splitTextToSize(t1,pageWidth-36),18,boxY+10);
+doc.setFont('helvetica','bold');doc.text(doc.splitTextToSize(t2,pageWidth-36),18,boxY+22);
+doc.setFontSize(8);doc.setTextColor(150,150,150);doc.setFont('helvetica','normal');doc.text('Página 1 de 1',pageWidth-20,pageHeight-10,{align:'right'});
+doc.save(`Formulario_Exoneracao_${nome.replace(/\s+/g,'_')||'servidor'}.pdf`);
+const m=$('msgExoneracao');m.textContent='PDF gerado.';m.className='msg ok';
+}catch(err){const m=$('msgExoneracao');m.textContent='Erro ao gerar PDF: '+(err.message||err);m.className='msg err';console.error(err)}
+finally{btn.disabled=!validoEx();btn.textContent='Gerar PDF'}
+};
+atualizarSimbolosEx();renderListaEx();renderEx();
+
+
+// ================= ADMISSAO SCRIPT =================
+const CHAVE_AD='admissao-diego-martins-lista';
+let atualIdAd=null;
+function lerListaAd(){try{return JSON.parse(localStorage.getItem(CHAVE_AD)||'[]')}catch(e){return[]}}
+function gravarListaAd(a){try{localStorage.setItem(CHAVE_AD,JSON.stringify(a))}catch(e){}}
+
+function atualizarSimbolosAd(){
+const cargo=document.getElementById('cargoAd').value;
+const sel=document.getElementById('simboloAd');const atual=sel.value;
+sel.innerHTML='<option value="">Selecione</option>';
+let opts=[];
+if(cargo==='Chefe de Gabinete Parlamentar')opts=['CC1'];
+else if(cargo==='Assessor de Gabinete Parlamentar')opts=['CC2','CC3','CC4','CC5','CC6','CC7','CC8','CC9'];
+opts.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o)});
+if(opts.includes(atual))sel.value=atual;
+else if(cargo==='Chefe de Gabinete Parlamentar')sel.value='CC1';
+else sel.value='';
+}
+
+function renderListaAd(){
+const el=document.getElementById('listaSalvosAdmissao');el.innerHTML='';
+const arr=lerListaAd();
+if(arr.length===0){el.innerHTML='<div class="pedido" style="cursor:default">Nenhum pedido salvo.</div>';return}
+arr.forEach(it=>{
+const d=document.createElement('div');d.className='pedido';
+const info=document.createElement('div');info.className='info';
+info.innerHTML=`<b>${it.nome}</b><span>${it.cargo} · ${it.simbolo} · ${fmtDataISO(it.data)} · salvo em ${fmtSalvo(it.salvoEm)}</span>`;
+const del=document.createElement('button');del.type='button';del.className='btn-excluir';del.textContent='Excluir';
+del.onclick=e=>{
+e.stopPropagation();
+if(!confirm('Tem certeza que deseja excluir?'))return;
+const atual=lerListaAd().filter(x=>x.id!==it.id);gravarListaAd(atual);
+if(atualIdAd===it.id){atualIdAd=null;['nomeAd','matAd','cargoAd','simboloAd','dataAd'].forEach(id=>document.getElementById(id).value='');atualizarSimbolosAd();document.getElementById('lotAd').value='GABINETE DO VEREADOR DIEGO MARTINS';renderAd()}
+renderListaAd();
+};
+d.append(info,del);
+d.onclick=()=>{
+atualIdAd=it.id;
+document.getElementById('nomeAd').value=it.nome;document.getElementById('matAd').value=it.matricula;document.getElementById('cargoAd').value=it.cargo;atualizarSimbolosAd();document.getElementById('simboloAd').value=it.simbolo;document.getElementById('lotAd').value=it.lotacao;document.getElementById('dataAd').value=it.data;renderAd();
+const m=document.getElementById('msgAdmissao');m.textContent='Pedido carregado.';m.className='msg ok';
+};
+el.appendChild(d);
+});
+}
+
+function validoAd(){
+const nome=document.getElementById('nomeAd').value.trim();
+const cargo=document.getElementById('cargoAd').value;
+const sim=document.getElementById('simboloAd').value;
+const lot=document.getElementById('lotAd').value.trim();
+const data=document.getElementById('dataAd').value;
+return Boolean(nome&&cargo&&sim&&lot&&data);
+}
+
+function renderAd(){
+const ok=validoAd();
+const msg=document.getElementById('msgAdmissao');
+if(ok){msg.textContent='Dados válidos.';msg.className='msg ok'}
+else{msg.textContent='Preencha nome, cargo, símbolo, lotação e data.';msg.className='msg err'}
+document.getElementById('salvarAdmissao').disabled=!ok;
+document.getElementById('pdfAdmissao').disabled=!ok;
+}
+
+function salvarLocalAd(){
+const dados={nome:document.getElementById('nomeAd').value.trim(),matricula:document.getElementById('matAd').value.trim(),cargo:document.getElementById('cargoAd').value,simbolo:document.getElementById('simboloAd').value,lotacao:document.getElementById('lotAd').value.trim(),data:document.getElementById('dataAd').value,salvoEm:new Date().toISOString()};
+const arr=lerListaAd();
+if(atualIdAd){const ix=arr.findIndex(x=>x.id===atualIdAd);if(ix>=0){arr[ix]={...arr[ix],...dados}}else{arr.unshift({id:atualIdAd,...dados})}}
+else{atualIdAd='a'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);arr.unshift({id:atualIdAd,...dados})}
+arr.sort((a,b)=>new Date(b.salvoEm)-new Date(a.salvoEm));
+gravarListaAd(arr);renderListaAd();
+}
+
+['nomeAd','matAd','cargoAd','simboloAd','lotAd','dataAd'].forEach(id=>{
+const el=document.getElementById(id);
+if(el){el.addEventListener('input',renderAd);el.addEventListener('change',renderAd)}
+});
+document.getElementById('cargoAd').addEventListener('change',()=>{atualizarSimbolosAd();renderAd()});
+document.getElementById('limparAdmissao').onclick=()=>{if(!confirm('Tem certeza que deseja apagar tudo e recomeçar?'))return;['nomeAd','matAd','cargoAd','simboloAd','dataAd'].forEach(id=>document.getElementById(id).value='');atualizarSimbolosAd();atualIdAd=null;document.getElementById('lotAd').value='GABINETE DO VEREADOR DIEGO MARTINS';renderAd()};
+document.getElementById('salvarAdmissao').onclick=()=>{
+if(!confirm('Deseja salvar esta admissão?'))return;
+salvarLocalAd();
+const m=document.getElementById('msgAdmissao');m.textContent='Salva.';m.className='msg ok';
+};
+
+document.getElementById('pdfAdmissao').onclick=async()=>{
+if(!confirm('Deseja salvar e gerar o PDF?'))return;
+if(!validoAd())return;
+salvarLocalAd();
+const btn=document.getElementById('pdfAdmissao');btn.disabled=true;btn.textContent='Gerando...';
+try{
+if(!window.jspdf)throw new Error('jsPDF não carregou');
+const {jsPDF}=window.jspdf;const doc=new jsPDF({compress:true});const pageWidth=doc.internal.pageSize.getWidth();const pageHeight=doc.internal.pageSize.getHeight();
+const logo=await carregarLogo();if(logo){try{doc.addImage(logo,'PNG',15,10,28,0)}catch(e){}}
+doc.setDrawColor(200,200,200);doc.setLineWidth(0.5);doc.line(46,10,46,30);
+doc.setTextColor(0,0,0);doc.setFont('helvetica','bold');doc.setFontSize(10.5);
+doc.text('INDICAÇÃO PARA ADMISSÃO',52,16);doc.text('EM CARGO EM COMISSÃO',52,21);
+doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.text('Câmara Municipal de Curitiba',52,27);
+let y=45;doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text('EXCELENTÍSSIMO SENHOR PRESIDENTE DA COMISSÃO EXECUTIVA',15,y);y+=10;
+doc.setFont('helvetica','normal');doc.setFontSize(9.5);
+const texto='O (A) Vereador(a) DIEGO MARTINS indica a pessoa abaixo identificada, para que seja admitida no Cargo em Comissão da Estrutura de Apoio à Atividade Político Parlamentar desta Câmara Municipal.';
+const splitTexto=doc.splitTextToSize(texto,pageWidth-30);doc.text(splitTexto,15,y);y+=(splitTexto.length*5)+10;
+const nome=document.getElementById('nomeAd').value.trim().toUpperCase();
+const mat=document.getElementById('matAd').value.trim().toUpperCase()||'N/A';
+const lot=document.getElementById('lotAd').value.trim().toUpperCase();
+const cargo=document.getElementById('cargoAd').value.toUpperCase();
+const simRaw=document.getElementById('simboloAd').value;
+const simNum=simRaw.startsWith('CC')?simRaw.substring(2):simRaw;
+const simbolo='CC - '+simNum;
+const dataVal=document.getElementById('dataAd').value;
+let dataFmt='___/___/______';if(dataVal){const [a,b,c]=dataVal.split('-');dataFmt=`${c}/${b}/${a}`}
+const rows=[['NOME:',nome],['MATRÍCULA Nº:',mat],['LOTAÇÃO:',lot],['CARGO:',cargo],['SÍMBOLO:',simbolo],['ADMITIR A PARTIR DE:',dataFmt]];
+const x0=15, w0=50, w1=pageWidth-30-50;doc.setFontSize(8.5);
+rows.forEach(r=>{
+const h=8;doc.setDrawColor(0,0,0);doc.setLineWidth(0.2);
+doc.setFillColor(250,250,250);doc.rect(x0,y,w0,h,'F');doc.rect(x0,y,w0,h);doc.rect(x0+w0,y,w1,h);
+doc.setTextColor(0,0,0);doc.setFont('helvetica','bold');doc.text(r[0],x0+2,y+5.2,{maxWidth:w0-3});
+doc.setFont('helvetica','normal');doc.text(r[1],x0+w0+2,y+5.2,{maxWidth:w1-3});
+y+=h;
+});
+y+=10;
+const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];const agora=new Date();
+doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(0,0,0);doc.text(`Curitiba, ${String(agora.getDate()).padStart(2,'0')} de ${meses[agora.getMonth()]} de ${agora.getFullYear()}`,pageWidth-15,y,{align:'right'});y+=30;
+doc.setDrawColor(0,0,0);doc.line(pageWidth/2-45,y,pageWidth/2+45,y);y+=5;
+doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text('VER. DIEGO MARTINS',pageWidth/2,y,{align:'center'});y+=12;
+doc.setDrawColor(180,180,180);doc.setFillColor(253,253,253);const boxY=y, boxH=32;doc.rect(15,boxY,pageWidth-30,boxH,'FD');
+doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(0,0,0);doc.text('INFORMAÇÕES IMPORTANTES',pageWidth/2,boxY+5,{align:'center'});
+doc.setFont('helvetica','normal');doc.setFontSize(8);
+const t1='Para efetivação da admissão deverão ser apresentados os documentos pessoais, certidões negativas e exames admissionais exigidos pela Diretoria Geral de Pessoal (DGEP).';
+const t2='Atenção: A posse e exercício ficam condicionados à apresentação de toda a documentação legal e comprovação de desincompatibilização quando aplicável.';
+doc.text(doc.splitTextToSize(t1,pageWidth-36),18,boxY+10);
+doc.setFont('helvetica','bold');doc.text(doc.splitTextToSize(t2,pageWidth-36),18,boxY+22);
+doc.setFontSize(8);doc.setTextColor(150,150,150);doc.setFont('helvetica','normal');doc.text('Página 1 de 1',pageWidth-20,pageHeight-10,{align:'right'});
+doc.save(`Formulario_Admissao_${nome.replace(/\s+/g,'_')||'servidor'}.pdf`);
+const m=$('msgAdmissao');m.textContent='PDF gerado.';m.className='msg ok';
+}catch(err){const m=$('msgAdmissao');m.textContent='Erro ao gerar PDF: '+(err.message||err);m.className='msg err';console.error(err)}
+finally{btn.disabled=!validoAd();btn.textContent='Gerar PDF'}
+};
+atualizarSimbolosAd();renderListaAd();renderAd();
+</script>
+</body>
+</html>

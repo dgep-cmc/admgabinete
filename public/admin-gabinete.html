@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Painel Administrativo — Gestão de Gabinetes</title>
+<style>
+:root{--fundo:#F2F3F1;--sup:#fff;--tinta:#182528;--mut:#5A6B6B;--linha:#D9DEDB;--verde:#0E4D36;--verde2:#E6F0EB;--erro:#B42318;--ok:#0E4D36;--fonte:"Helvetica Neue",Helvetica,Roboto,Arial,"Segoe UI",sans-serif}
+*{box-sizing:border-box}
+body{font-family:var(--fonte);margin:0;background:var(--fundo);color:var(--tinta);-webkit-font-smoothing:antialiased}
+.wrap{max-width:800px;margin:0 auto;padding:28px 18px 40px}
+.topo{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-bottom:18px;border-bottom:1px solid var(--linha)}
+.topo small{font-size:12px;letter-spacing:.06em;color:var(--mut)}
+.topo strong{font-family:var(--fonte);font-size:20px;font-weight:700;white-space:nowrap}
+.menu{display:flex;gap:18px;padding:14px 0;border-bottom:1px solid var(--linha);flex-wrap:wrap}
+.menu a{font-size:14px;font-weight:600;color:var(--tinta);text-decoration:none}
+.menu a.ativo{color:var(--verde);border-bottom:2px solid var(--verde);padding-bottom:2px}
+h1{font-family:var(--fonte);font-size:26px;line-height:1.1;margin:20px 0 4px;font-weight:700}
+.sub{color:var(--mut);font-size:14px;margin:0 0 18px}
+.box{background:var(--sup);border:1px solid var(--linha);padding:20px;margin-bottom:20px}
+.campo{margin-bottom:12px}
+.campo label{font-size:13px;font-weight:600;display:block;margin-bottom:6px}
+.campo input,.campo select{width:100%;height:42px;border:1px solid var(--linha);padding:0 10px;font-family:var(--fonte);font-size:14px;background:#fff}
+.duas{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{height:42px;padding:0 18px;background:var(--verde);color:#fff;border:1px solid var(--verde);font-weight:600;cursor:pointer;font-family:var(--fonte)}
+.btn.ghost{background:#fff;color:var(--verde)}
+.tabela{width:100%;border-collapse:collapse;margin-top:12px;background:#fff;font-size:13px}
+.tabela th,.tabela td{border:1px solid var(--linha);padding:10px 12px;text-align:left}
+.tabela th{background:#F2F3F1;font-weight:600}
+.badge{display:inline-block;padding:2px 8px;font-size:11px;font-weight:600;background:var(--verde2);color:var(--verde);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="topo"><small>Câmara Municipal de Curitiba — DGEP</small><strong>Painel Admin — 38 Gabinetes</strong></div>
+<nav class="menu">
+  <a href="/portal-diego-martins.html">Portal (Diego Martins)</a>
+  <a class="ativo" href="/admin-gabinete.html">Administração de Gabinetes</a>
+</nav>
+
+<h1>Gestão de Gabinetes e Permissões (Google Workspace)</h1>
+<p class="sub">Cadastre os vereadores, e-mails institucionais do Google Workspace e configure a segregação de acesso por página.</p>
+
+<div class="box">
+  <h3 style="margin-top:0;font-size:16px;font-weight:700;">Cadastrar / Editar Vereador & Gabinete</h3>
+  <div class="duas">
+    <div class="campo"><label for="nomeVer">Nome do Vereador(a)</label><input id="nomeVer" placeholder="Ex: Diego Martins"/></div>
+    <div class="campo"><label for="emailVer">E-mail Google Workspace (@cmc.pr.gov.br)</label><input id="emailVer" placeholder="ex: diego.martins@cmc.pr.gov.br"/></div>
+  </div>
+  <div class="duas">
+    <div class="campo"><label for="tituloGab">Título do Gabinete</label><input id="tituloGab" value="GABINETE DO VEREADOR"/></div>
+    <div class="campo"><label for="statusVer">Status de Acesso</label>
+      <select id="statusVer"><option value="ativo">Ativo</option><option value="bloqueado">Bloqueado</option></select>
+    </div>
+  </div>
+  <button class="btn" id="salvarVer" type="button">Salvar Vereador</button>
+  <div id="msgAdmin" class="msg" style="margin-top:10px;font-size:13px;font-weight:600;"></div>
+</div>
+
+<div class="box">
+  <h3 style="margin-top:0;font-size:16px;font-weight:700;">Vereadores Cadastrados (38 Gabinetes)</h3>
+  <p style="font-size:13px;color:var(--mut);">Cada vereador possui acesso restrito ao seu e-mail institucional no Google Sites e páginas segregadas.</p>
+  <div style="overflow-x:auto">
+    <table class="tabela" id="tabelaVereadores">
+      <thead>
+        <tr>
+          <th>Vereador(a)</th>
+          <th>E-mail Workspace</th>
+          <th>Lotação / Gabinete</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyVereadores">
+        <!-- Preenchido via JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const CHAVE_ADMIN = 'cmc_vereadores_admin_lista';
+
+let vereadoresPadrao = [
+  {id:'v1', nome:'Diego Martins', email:'diego.martins@cmc.pr.gov.br', lotacao:'GABINETE DO VEREADOR DIEGO MARTINS', status:'ativo'},
+  {id:'v2', nome:'Ana Cássia', email:'ana.cassia@cmc.pr.gov.br', lotacao:'GABINETE DA VEREADORA ANA CÁSSIA', status:'ativo'},
+  {id:'v3', nome:'Carlos Alberto', email:'carlos.alberto@cmc.pr.gov.br', lotacao:'GABINETE DO VEREADOR CARLOS ALBERTO', status:'ativo'},
+  {id:'v4', nome:'Beatriz Lima', email:'beatriz.lima@cmc.pr.gov.br', lotacao:'GABINETE DA VEREADORA BEATRIZ LIMA', status:'ativo'}
+  // Demais vereadores podem ser adicionados dinamicamente
+];
+
+function lerVereadores(){
+  try{
+    const dados = localStorage.getItem(CHAVE_ADMIN);
+    return dados ? JSON.parse(dados) : vereadoresPadrao;
+  }catch(e){
+    return vereadoresPadrao;
+  }
+}
+function gravarVereadores(arr){
+  try{localStorage.setItem(CHAVE_ADMIN, JSON.stringify(arr))}catch(e){}
+}
+
+function renderTabela(){
+  const tbody = $('tbodyVereadores');
+  tbody.innerHTML = '';
+  const lista = lerVereadores();
+  lista.forEach(v=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${v.nome}</b></td>
+      <td><code>${v.email}</code></td>
+      <td>${v.lotacao}</td>
+      <td><span class="badge" style="background:${v.status==='ativo'?'#E6F0EB':'#FEE4E2'};color:${v.status==='ativo'?'#0E4D36':'#B42318'}">${v.status.toUpperCase()}</span></td>
+      <td>
+        <button type="button" class="btn ghost" style="height:32px;padding:0 10px;font-size:12px;" onclick="editarVer('${v.id}')">Editar</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+let editandoId = null;
+window.editarVer = function(id){
+  const lista = lerVereadores();
+  const v = lista.find(x=>x.id===id);
+  if(v){
+    editandoId = v.id;
+    $('nomeVer').value = v.nome;
+    $('emailVer').value = v.email;
+    $('tituloGab').value = v.lotacao;
+    $('statusVer').value = v.status;
+    $('msgAdmin').textContent = 'Editando vereador: ' + v.nome;
+    $('msgAdmin').style.color = 'var(--verde)';
+  }
+};
+
+$('salvarVer').onclick = ()=>{
+  const nome = $('nomeVer').value.trim();
+  const email = $('emailVer').value.trim();
+  const lotacao = $('tituloGab').value.trim();
+  const status = $('statusVer').value;
+  if(!nome || !email){
+    alert('Preencha nome e e-mail.');
+    return;
+  }
+  const lista = lerVereadores();
+  if(editandoId){
+    const ix = lista.findIndex(x=>x.id===editandoId);
+    if(ix>=0){
+      lista[ix] = {id:editandoId, nome, email, lotacao, status};
+    }
+    editandoId = null;
+  } else {
+    const novoId = 'v' + Date.now().toString(36);
+    lista.push({id:novoId, nome, email, lotacao, status});
+  }
+  gravarVereadores(lista);
+  renderTabela();
+  $('nomeVer').value = '';
+  $('emailVer').value = '';
+  $('msgAdmin').textContent = 'Vereador salvo com sucesso!';
+  $('msgAdmin').style.color = 'var(--verde)';
+  setTimeout(()=>{$('msgAdmin').textContent=''}, 3000);
+};
+
+renderTabela();
+</script>
+</body>
+</html>

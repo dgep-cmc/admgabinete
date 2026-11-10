@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Início — Diego Martins</title>
+<style>
+:root{--fundo:#F2F3F1;--sup:#fff;--tinta:#182528;--mut:#5A6B6B;--linha:#D9DEDB;--verde:#0E4D36;--verde2:#E6F0EB;--fonte:"Helvetica Neue",Helvetica,Roboto,Arial,"Segoe UI",sans-serif}
+*{box-sizing:border-box}
+body{font-family:var(--fonte);margin:0;background:var(--fundo);color:var(--tinta);-webkit-font-smoothing:antialiased}
+.wrap{max-width:640px;margin:0 auto;padding:28px 18px 40px}
+h1{font-family:var(--fonte);font-size:28px;line-height:1.1;margin:10px 0 4px;font-weight:700;letter-spacing:-.02em}
+.sub{color:var(--mut);font-size:14px;margin:0 0 18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.card{background:var(--sup);border:1px solid var(--linha);padding:20px 16px;text-decoration:none;color:var(--tinta);border-radius:2px}
+.card b{font-size:16px;display:block;margin-bottom:6px}
+.card span{font-size:13px;color:var(--mut)}
+.card:hover{border-color:var(--verde)}
+@media(max-width:560px){.grid{grid-template-columns:1fr}h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Portal do Vereador</h1>
+<p class="sub">Acesso rápido</p>
+<div class="grid">
+<a class="card" href="#" onclick="if(parent && parent.carregarTela) parent.carregarTela('gabinete'); return false;"><b>Composição do Gabinete</b><span>Definir quantidades por símbolo e gerar o formulário.</span></a>
+<a class="card" href="#" onclick="if(parent && parent.carregarTela) parent.carregarTela('exoneracao'); return false;"><b>Exoneração de Servidor</b><span>Indicar matrícula, nome e cargo para gerar o formulário.</span></a>
+</div>
+</div>
+</body>
+</html>
